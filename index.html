@@ -1,0 +1,183 @@
+        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Bond web app</title>
+
+		<!-- include javascript and css files for editablegrid -->		
+		<script src="editablegrid/editablegrid.js"></script>
+		<script src="editablegrid/editablegrid_renderers.js" ></script>
+		<script src="editablegrid/editablegrid_editors.js" ></script>
+		<script src="editablegrid/editablegrid_validators.js" ></script>
+		<script src="editablegrid/editablegrid_utils.js" ></script>
+		<script src="editablegrid/editablegrid_charts.js" ></script>
+		<link rel="stylesheet" href="editablegrid/editablegrid.css" type="text/css" media="screen">
+		
+
+		<!-- include javascript and css files for jQuery -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<!--<script src="jquery-ui-1.11.4.custom/external/jquery/jquery.js" ></script>-->
+		<!--<script src="jquery-ui-1.11.4.custom/jquery-ui.min.js" ></script>-->
+		<!--<link rel="stylesheet" href="jquery-ui-1.11.4.custom/jquery-ui.min.css" type="text/css" media="screen">-->
+		<!--<link rel="stylesheet" href="jquery-ui-1.11.4.custom/jquery-ui.theme.css" type="text/css" media="screen">-->
+		<!--<link rel="stylesheet" href="jquery-ui-1.11.4.custom/jquery-ui.structure.css" type="text/css" media="screen">-->
+		
+		<!-- include javascript files for amCharts -->
+	        <script src="amcharts/amcharts.js" type="text/javascript"></script>
+                <script src="amcharts/xy.js" type="text/javascript"></script>
+		
+		<!-- include javascript files for PapaParse -->
+	        <script src="papaparse/papaparse.min.js" type="text/javascript"></script>
+	        
+                <!-- include javascript and css files for Bootstrap -->
+                <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+                <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js" type="text/javascript"></script>
+	        
+		
+        	<!-- include javascript files for PCA WEB APP -->
+                <!--<link rel="stylesheet" type="text/css" href="simple.css" media="screen"/>-->
+                
+ 
+        </head>
+        <body style="padding-top: 70px;padding-bottom: 30px;">
+                <nav class="navbar navbar-default navbar-fixed-top">
+                        <div class="container-fluid">
+                                <div class="navbar-header">
+                                        <a class="navbar-brand" href="#">
+                                                <img alt="Bond web app" src="...">
+                                        </a>
+                                </div>
+                                <p class="navbar-text">Simple bond risk analysis</p>
+                                <div class="navbar-right" style="margin-right: 10px">
+                                
+                                        <div class="btn-group">
+                                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                                        Load & Import <span class="caret"></span>
+                                                </button>
+                                                  <ul class="dropdown-menu">
+                                                        <li><a href="#" onclick="import_file()">Load *.csv file</a></li>
+                                                  </ul>
+                                        </div>
+                                        <button type="button" class="btn btn-danger navbar-btn" onclick="calculate()">Calculate</button>
+                                        <button type="button" class="btn btn-success navbar-btn" onclick="export_scenarios()">Export</button>
+                                </div>
+                        </div>
+                </nav>
+
+        
+
+                <div class="container">
+                        <div class="row">
+                                <div class="col-lg-5">                    
+                                        <div class="panel panel-default">
+                                                <div class="panel-heading">Add bond</div>
+                                                <div class="panel-body">
+                                                        <form class="form-horizontal">
+                                                                <!-- Notional -->
+                                                                <div class="form-group">
+                                                                        <label class="col-lg-4 control-label">Notional</label>
+                                                                        <div class="col-lg-8">
+                                                                                <input type="number" step="any" class="form-control input-sm" placeholder="0">
+                                                                                <span class="help-block">The amount repaid at maturity.</span>
+                                                                        </div>
+
+                                                                </div>
+                                                                
+                                                                <!-- Market Value -->
+                                                                <div class="form-group">
+                                                                        <label class="col-lg-4 control-label">Market Value</label>
+                                                                        <div class="col-lg-8">
+                                                                                <input type="number" step="any" class="form-control input-sm" buttons="false" value="0">
+                                                                                <span class="help-block">The current market value (dirty).</span>
+                                                                        </div>
+                                                                </div>
+                                                                
+                                                                <!-- Maturity Date -->
+                                                                <div class="form-group">
+                                                                        <label class="col-lg-4 control-label">Maturity Date</label>
+                                                                        <div class="col-lg-8">
+                                                                                <input type="date" value="2011-08-19" class="form-control input-sm" buttons="false" value="0">
+                                                                                <span class="help-block">The date on which the notional is repaid.</span>
+                                                                        </div>
+                                                                </div>
+                                                                
+                                                                <!-- Coupon -->
+                                                                <div class="form-group">
+                                                                        <label class="col-lg-4 control-label">Coupon</label>
+                                                                        <div class="col-lg-8">
+                                                                                <input type="number" step="0.125" class="form-control input-sm" value="0">
+                                                                                <span class="help-block">Coupon rate (or current fixing for floating rate bonds).</span>
+                                                                        </div>
+                                                                </div>
+                                                                
+                                                                <!-- Coupon Frequency -->
+                                                                <div class="form-group">
+                                                                        <label class="col-lg-4 control-label">Coupon frequency</label>
+                                                                        <div class="col-lg-8">
+                                                                        <select class="form-control input-sm">
+                                                                                  <option value="1M">1M</option>
+                                                                                  <option value="3M">3M</option>
+                                                                                  <option value="6M">6M</option>
+                                                                                  <option value="1Y">1Y</option>
+                                                                        </select>
+                                                                                <span class="help-block">Coupon frequency.</span>
+                                                                        </div>
+                                                                </div>
+                                                                
+                                                                <!-- Forward Reference -->
+                                                                <div class="form-group">
+                                                                        <label class="col-lg-4 control-label">Forward reference</label>
+                                                                        <div class="col-lg-8">
+                                                                                <input type="text" class="form-control input-sm" value="">
+                                                                                <span class="help-block">Reference curve. Leave empty for fixed rate bonds</span>
+                                                                        </div>
+                                                                </div>
+
+                                                                <!-- Coupon spread -->
+                                                                <div class="form-group">
+                                                                        <label class="col-lg-4 control-label">Coupon spread</label>
+                                                                        <div class="col-lg-8">
+                                                                                <input type="number" step="0.125" class="form-control input-sm" value="0">
+                                                                                <span class="help-block">Coupon spread for floating rate bonds.</span>
+                                                                        </div>
+                                                                </div>
+                                                                
+                                                                </div>
+                                                                </div>
+                                                        </form>
+                                                </div>
+                                        </div>
+                                </div>
+
+                        <div class="row">
+                                <div class="col-lg-7">
+                                        <div id="chart_bond" style="width:100%; height:400px;">
+                                        
+                                        </div>
+                                </div>
+                        </div>
+
+
+
+
+                    <ul id="tabs" class="nav nav-pills" data-tabs="tabs">
+                        <li class="active"><a href="#bonds" data-toggle="tab">Bonds</a></li>
+                        <li><a href="#curves" data-toggle="tab">Curves</a></li>
+                    </ul>
+                    <div id="tabs" class="tab-content">
+                        <div class="tab-pane active" id="bonds">
+                                
+                        </div>
+                        <div class="tab-pane" id="curves">
+ 
+                        </div>
+                    </div>
+                </div>
+
+
+                </div> <!-- /container -->
+
+
+        </body>
+</html>
