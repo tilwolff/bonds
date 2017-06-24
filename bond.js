@@ -1,29 +1,26 @@
-var Bond=function(notional, maturity, coupon, freq_str, ref_curve, coupon_spread){
+var Bond=function(notional, maturity, coupon, freq_str, ref_curve_str, coupon_spread){
         this._notional=notional;
         this._maturity=maturity;        
         this._coupon=coupon;
         this._freq=str_to_time(freq_str);
-        this._ref_curve=ref_curve;
+        this._ref_curve_str=ref_curve_str;
         this._coupon_spread=coupon_spread;
         
-        this._is_floater= (null==this._ref_curve) ? false : true;
+        this._is_floater= (""!=this._ref_curve_str);
         
 }
 
 
-Bond.prototype.dirty_value=function(valdate,curves,spread){
+Bond.prototype.dirty_value=function(valdate,disc_curves,fwd_curves,spread){
 
         var t=(this._maturity-valdate)  / (1000*60*60*24*365);
 
         //to do: add zero coupon rate of curves
         var df=Math.pow(1+spread,-t);
         
-        var cp_amount=0;
+        var cp_amount=this._coupon*this._freq*this._notional;
         if (this._is_floater){
                 //to do: handle floaters
-        }
-        else{
-                cp_amount=this._coupon*this._freq*this._notional;
         }
         
         var res=(this._notional+cp_amount)*df;
@@ -43,11 +40,22 @@ Bond.prototype.dirty_value=function(valdate,curves,spread){
 }
 
 
-Bond.prototype.ytm=function(valdate,dirty_value){
-        return 0;
+Bond.prototype.ytm=function(valdate,fwd_curves,dirty_value){
+        var res=0;
+        var eps=0.0001;
+        var x=this.dirty_value(valdate,null,fwd_curves,res);
+        var dx=0;
+        var nmax=10;
+        while(Math.abs(x-dirty_value)>0.00001 && nmax>0){
+                dx=(this.dirty_value(valdate,null,fwd_curves,res+eps)-x)/eps;
+                res+=(dirty_value-x)/dx;
+                var x=this.dirty_value(valdate,null,fwd_curves,res);
+                nmax--;
+        }
+        return res;
 }
 
-Bond.prototype.z_spread=function(valdate,dirty_value,curves){
+Bond.prototype.z_spread=function(valdate,dirty_value,disc_curves,fwd_curves){
         return 0;
 }
 

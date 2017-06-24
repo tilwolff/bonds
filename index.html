@@ -101,7 +101,7 @@
                                                                         <label class="col-lg-4 control-label">Coupon</label>
                                                                         <div class="col-lg-8">
                                                                                 <input type="number" step="0.125" class="form-control input-sm" value="0.875" id="coupon">
-                                                                                <span class="help-block">Coupon rate or, for floating rate bonds, current coupon fixing (e.g. 1.0 for 1 percent).</span>
+                                                                                <span class="help-block">Coupon rate or, for floating rate bonds, spread over reference rate (e.g. 1.0 for 1 percent).</span>
                                                                         </div>
                                                                 </div>
                                                                 
@@ -128,12 +128,12 @@
                                                                         </div>
                                                                 </div>
 
-                                                                <!-- Coupon spread -->
+                                                                <!-- Current coupon fixing -->
                                                                 <div class="form-group">
-                                                                        <label class="col-lg-4 control-label">Coupon spread</label>
+                                                                        <label class="col-lg-4 control-label">Current coupon fixing</label>
                                                                         <div class="col-lg-8">
-                                                                                <input type="number" step="0.125" class="form-control input-sm" value="0" id="coupon_spread">
-                                                                                <span class="help-block">Coupon spread for floating rate bonds (e.g. 2.0 for 2 percent).</span>
+                                                                                <input type="number" step="0.125" class="form-control input-sm" value="0" id="current_fixing">
+                                                                                <span class="help-block">Current coupon fixing for floating rate bonds (e.g. 2.0 for 2 percent).</span>
                                                                         </div>
                                                                 </div>
                                                                 <button type="submit" class="btn btn-primary">Add bond to list</button>
@@ -175,7 +175,7 @@
                                                                                 <div class="input-group">
                                                                                         <input type="number" step="0.01" class="form-control input-sm" value="0" id="ytm">
                                                                                         <span class="input-group-btn">
-                                                                                                <button class="btn btn-danger btn-sm" type="button" data-toggle="tooltip" data-container="body" title="Refresh yield-to-maturity">
+                                                                                                <button class="btn btn-danger btn-sm" type="button" data-toggle="tooltip" data-container="body" title="Refresh yield-to-maturity" onclick="update_yield()">
                                                                                                         <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                                                                                                 </button>
                                                                                         </span>
