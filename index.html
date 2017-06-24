@@ -69,8 +69,23 @@
         
 
                 <div class="container">
+                        <div class="row">    
+                                <div class="col-lg-6">            
+                                        <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                        <!-- Valuation Date -->
+                                                        <div class="form-group">
+                                                                <label class="col-lg-4 control-label">Valuation Date</label>
+                                                                <div class="col-lg-8">
+                                                                        <input type="date" value="2017-01-01" class="form-control input-sm" id="val_date">
+                                                                </div>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>  
                         <div class="row">
-                                <div class="col-lg-5">                    
+                                <div class="col-lg-6">                    
                                         <form class="form-horizontal" autocomplete="false" id="form_bond">      
                                         <div class="panel panel-default">
                                                 <div class="panel-heading">New bond - base data</div>
@@ -136,20 +151,11 @@
                                                                                 <span class="help-block">Current coupon fixing for floating rate bonds (e.g. 2.0 for 2 percent).</span>
                                                                         </div>
                                                                 </div>
-                                                                <button type="submit" class="btn btn-primary">Add bond to list</button>
                                                         </div>
                                                 </div>
                                                 <div class="panel panel-default">
                                                         <div class="panel-heading">New bond - valuation data</div>
                                                         <div class="panel-body"> 
-                                                                <!-- Valuation Date -->
-                                                                <div class="form-group">
-                                                                        <label class="col-lg-4 control-label">Valuation Date</label>
-                                                                        <div class="col-lg-8">
-                                                                                <input type="date" value="2017-01-01" class="form-control input-sm" id="val_date">
-                                                                                <span class="help-block">As of date for Market Value.</span>
-                                                                        </div>
-                                                                </div>
                                                                                                                                
                                                                 <!-- Market Value -->
                                                                 <div class="form-group">
@@ -183,15 +189,18 @@
                                                                                 <span class="help-block">Yield-to-maturity (internal rate of return).</span>
                                                                         </div>
                                                                 </div>  
-                                                                <button type="submit" class="btn btn-primary">Add bond to list</button>                  
                                                         </div>
                                                 </div>
                                         </form>
                                 </div>
-                                <div class="col-lg-7" id="chart_bond">
-
+                                <div class="col-lg-6">
+                                        <div class="panel panel-default">
+                                                <div class="panel-heading">Standardised risk analysis</div>
+                                                        <div class="panel-body" id="risk">
+                                                        </div>
+                                                </div>
+                                        </div>
                                 </div>
-                        </div>
 
 
 

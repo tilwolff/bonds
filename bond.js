@@ -7,7 +7,6 @@ var Bond=function(notional, maturity, coupon, freq_str, ref_curve_str, coupon_sp
         this._coupon_spread=coupon_spread;
         
         this._is_floater= (""!=this._ref_curve_str);
-        
 }
 
 
