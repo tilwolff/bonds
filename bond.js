@@ -1,61 +1,80 @@
-var Bond=function(notional, maturity, coupon, freq_str, ref_curve_str, coupon_spread){
+var Bond=function(notional, maturity, coupon, freq_str, is_floater, current_fixing, tags){
         this._notional=notional;
         this._maturity=maturity;        
         this._coupon=coupon;
-        this._freq=str_to_time(freq_str);
-        this._ref_curve_str=ref_curve_str;
-        this._coupon_spread=coupon_spread;
+        this._freq_str=freq_str;
+        this._freq= str_to_time(freq_str);
+        this._current_fixing=current_fixing;
+        this._tags=tags;
+        this._is_floater= is_floater;
         
-        this._is_floater= (""!=this._ref_curve_str);
+        this._residual_spread=null;
+        //performance increase
+        this._index_disc_curve=null;
+        this._index_fwd_curve=null;
 }
 
+Bond.prototype.initialise=function(pv,md){
+        this._ytm=0;
+}
 
-Bond.prototype.dirty_value=function(valdate,disc_curves,fwd_curves,spread){
+Bond.prototype.pv=function(md){
+        var disc_curve=get_disc_curve(md, this._tags);
+        var spread_curve=get_spread_curve(md, this._tags);
+        var fwd_curve=get_fwd_curve(md, this._tags, this._freq_str);
+        return this.dirty_value(md.valdate,disc_curve, spread_curve, fwd_curve, this._residual_spread);
+}
+
+Bond.prototype.dirty_value=function(valdate,disc_curve, spread_curve, fwd_curve, spread){
+        if(null==disc_curve) disc_curve=get_const_curve(0);
+        if(null==spread_curve) spread_curve=get_const_curve(0);
+        if(null==fwd_curve) fwd_curve=get_const_curve(0);
 
         var t=(this._maturity-valdate)  / (1000*60*60*24*365);
-
-        //to do: add zero coupon rate of curves
-        var df=Math.pow(1+spread,-t);
+        
+        var dr=get_rate(disc_curve,t);
+        var sr=get_rate(spread_curve,t)
+        var df=Math.pow(1+dr+sr+spread,-t);
         
         var cp_amount=this._coupon*this._freq*this._notional;
+        
+        var res=(this._notional+cp_amount)*df;
+        
         if (this._is_floater){
                 //to do: handle floaters
         }
         
-        var res=(this._notional+cp_amount)*df;
         
         while (t>this._freq){
                 t-=this._freq;
                 
+                dr=get_rate(disc_curve,t);
+                sr=get_rate(spread_curve,t)
+                df=Math.pow(1+dr+sr+spread,-t);
+                
+                res+=cp_amount*df;
+                               
                 if (this._is_floater){
                         //to do: handle floaters
                 }
-                
-                //to do: add zero coupon rate of curves
-                var df=Math.pow(1+spread,-t);
-                res+=cp_amount*df;
         }
         return res;
 }
 
 
-Bond.prototype.ytm=function(valdate,fwd_curves,dirty_value){
+Bond.prototype.ytm=function(valdate,fwd_curve,dirty_value){
         var res=0;
         var eps=0.0001;
-        var x=this.dirty_value(valdate,null,fwd_curves,res);
+        var x=this.dirty_value(valdate,null,null,fwd_curve,res);
         var dx=0;
         var nmax=10;
         while(Math.abs(x-dirty_value)>0.00001 && nmax>0){
-                dx=(this.dirty_value(valdate,null,fwd_curves,res+eps)-x)/eps;
+                dx=(this.dirty_value(valdate,null,null,fwd_curve,res+eps)-x)/eps;
                 res+=(dirty_value-x)/dx;
-                var x=this.dirty_value(valdate,null,fwd_curves,res);
+                var x=this.dirty_value(valdate,null,null,fwd_curve,res);
                 nmax--;
         }
         return res;
-}
-
-Bond.prototype.z_spread=function(valdate,dirty_value,disc_curves,fwd_curves){
-        return 0;
 }
 
 function str_to_time(str){
