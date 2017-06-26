@@ -41,7 +41,11 @@ Bond.prototype.dirty_value=function(valdate,disc_curve, spread_curve, fwd_curve,
         var res=(this._notional+cp_amount)*df;
         
         if (this._is_floater){
-                //to do: handle floaters
+                if (t>this._freq){
+                        res+=(this._notional*get_fwd_amount(fwd_curve,t-this._freq,t))*df;
+                }else{
+                        res+=(this._notional*t*this._current_fixing)*df;
+                }
         }
         
         
@@ -53,9 +57,12 @@ Bond.prototype.dirty_value=function(valdate,disc_curve, spread_curve, fwd_curve,
                 df=Math.pow(1+dr+sr+spread,-t);
                 
                 res+=cp_amount*df;
-                               
                 if (this._is_floater){
-                        //to do: handle floaters
+                        if (t>this._freq){
+                                res+=(this._notional*get_fwd_amount(fwd_curve,t-this._freq,t))*df;
+                        }else{
+                                res+=(this._notional*t*this._current_fixing)*df;
+                        }
                 }
         }
         return res;

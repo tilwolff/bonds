@@ -158,19 +158,34 @@ var risk_analysis=function(){
         var regxp_result=regxp.exec(val_date);
         
         val_date=new Date(regxp_result[1],regxp_result[2]-1,regxp_result[3],0,0,0);
+
         var ytm=b.ytm(val_date,null,dirty_value);
         
-        var curve_steep={
-                labels:         ["1Y","2Y","3Y","7Y","10Y"],
-                times:          [1,2,3,7,10],
-                values:         [0.01,0.02,0.03,0.07,0.1]
+        var bcbs352times=[0.0028,0.0417,0.1667,0.375,0.625,0.875,1.25,1.75,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,12.5,17.5,25];
+        
+        var curve_up={labels:[],times:bcbs352times,values:[]};
+        var curve_down={labels:[],times:bcbs352times,values:[]};
+        var curve_steepener={labels:[],times:bcbs352times,values:[]};
+        var curve_flattener={labels:[],times:bcbs352times,values:[]};
+        var curve_shortup={labels:[],times:bcbs352times,values:[]};
+        var curve_shortdown={labels:[],times:bcbs352times,values:[]};
+        
+        var slong,sshort;
+        for (var i=0;i<bcbs352times.length;i++){
+                curve_up.values.push(0.02);
+                curve_down.values.push(-0.02);
+                sshort=Math.exp(-bcbs352times[i]/4);
+                slong=1-sshort;
+                curve_shortup.values.push(0.025*sshort);
+                curve_shortdown.values.push(-0.025*sshort);
+                curve_steepener.values.push(-0.65*0.025*sshort+0.9*0.01*slong);
+                curve_flattener.values.push(0.8*0.025*sshort-0.6*0.01*slong);
         }
         
+                                
+                                
         var scenarios=[
                 {
-                        description: "Steepener",
-                        value: b.dirty_value(val_date,curve_steep,null,null,ytm)
-                },{
                         description: "Spread Shock -100 bp",
                         value: b.dirty_value(val_date,null,null,null,ytm-0.01)
                 },{
@@ -191,11 +206,28 @@ var risk_analysis=function(){
                 },{
                         description: "Spread Shock +1000 bp",
                         value: b.dirty_value(val_date,null,null,null,ytm+0.1)
+                },{
+                        description: "BCBS 368 Up",
+                        value: b.dirty_value(val_date,curve_up,null,curve_up,ytm)
+                },{
+                        description: "BCBS 368 Down",
+                        value: b.dirty_value(val_date,curve_down,null,curve_down,ytm)
+                },{
+                        description: "BCBS 368 Steepener",
+                        value: b.dirty_value(val_date,curve_steepener,null,curve_steepener,ytm)
+                },{
+                        description: "BCBS 368 Flattener",
+                        value: b.dirty_value(val_date,curve_flattener,null,curve_flattener,ytm)
+                },{
+                        description: "BCBS 368 Short Rate Up",
+                        value: b.dirty_value(val_date,curve_shortup,null,curve_shortup,ytm)
+                },{
+                        description: "BCBS 368 Short Rate Down",
+                        value: b.dirty_value(val_date,curve_shortdown,null,curve_shortdown,ytm)
                 }
         ];
         
-        var i;
-        for (i=0;i<scenarios.length;i++){
+        for (var i=0;i<scenarios.length;i++){
                 scenarios[i].value_change=(scenarios[i].value-dirty_value);
                 scenarios[i].percentage=scenarios[i].value_change/dirty_value*100;
                 

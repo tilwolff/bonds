@@ -30,5 +30,5 @@ var get_rate=function(curve,t,imin,imax){
 }
 
 var get_fwd_amount=function(curve,tstart,tend){
-        return Math.pow((1+get_rate(curve,tstart)),tstart) / Math.pow((1+get_rate(curve,tend)),tend) -1;
+        return Math.pow((1+get_rate(curve,tstart)),-tstart) / Math.pow((1+get_rate(curve,tend)),-tend) -1;
 }
