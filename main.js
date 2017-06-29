@@ -80,7 +80,7 @@ var display_scenarios=function(s){
         
         // create elements <table> and a <tbody>
         var tbl= document.createElement("table");
-        tbl.className = "table";
+        tbl.className = "table table-bordered table-striped";
         var tblBody=document.createElement("tbody");
         
         
@@ -113,12 +113,15 @@ var display_scenarios=function(s){
                 row.appendChild(cell);
                 
                 cell = document.createElement("td");
-                cell.innerHTML=s[i].value_change.toFixed(2);
+                cell.innerHTML=(Math.round((s[i].value_change * 1000)/10)/100).toLocaleString();
+                cell.style.textAlign = "right";
                 row.appendChild(cell);
                 
                 cell = document.createElement("td");
                 progress=document.createElement("div");
                 progress.className="progress";
+                progress.style.backgroundColor="#888888";
+                progress.style.backgroundImage="none";
                 progressbar=document.createElement("div");
                 progressbar.className="progress-bar";
                 progressbar.setAttribute("role", "progressbar"); 
@@ -186,14 +189,11 @@ var risk_analysis=function(){
                                 
         var scenarios=[
                 {
-                        description: "Spread Shock -100 bp",
-                        value: b.dirty_value(val_date,null,null,null,ytm-0.01)
-                },{
-                        description: "Spread Shock -1 bp",
-                        value: b.dirty_value(val_date,null,null,null,ytm-0.0001)
-                },{
                         description: "Spread Shock +1 bp",
                         value: b.dirty_value(val_date,null,null,null,ytm+0.0001)
+                },{
+                        description: "Spread Shock +50 bp",
+                        value: b.dirty_value(val_date,null,null,null,ytm+0.005)
                 },{
                         description: "Spread Shock +100 bp",
                         value: b.dirty_value(val_date,null,null,null,ytm+0.01)
@@ -229,7 +229,7 @@ var risk_analysis=function(){
         
         for (var i=0;i<scenarios.length;i++){
                 scenarios[i].value_change=(scenarios[i].value-dirty_value);
-                scenarios[i].percentage=scenarios[i].value_change/dirty_value*100;
+                scenarios[i].percentage=scenarios[i].value_change/Math.abs(dirty_value)*100;
                 
         }
         
