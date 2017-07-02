@@ -236,5 +236,43 @@ var risk_analysis=function(){
         display_scenarios(scenarios);
 }
 
+var isin_search=function(){
+        var isin = document.getElementById("isin").value;
+        
+        var callb=function(results,file){
+                //get data from returned object
+                var maturity = results.data[0].MATURITY_DATE;
+                var coupon = results.data[0].COUPON_RATE;
+                var is_floater = results.data[0].COUPON_DEFINITION;
+                
+                //convert formats
+                maturity=maturity.substring(6,10)+"-"+maturity.substring(3,5)+"-"+maturity.substring(0,2);
+                coupon=parseFloat(coupon);
+                is_floater=(is_floater=="CD2") ? "Yes" : "No";
+                
+                //write to html form
+                document.getElementById("notional").value=100;
+                document.getElementById("maturity").value=maturity;
+                document.getElementById("coupon").value=coupon;
+                document.getElementById("freq").value="1Y";
+                document.getElementById("is_floater").value=is_floater;
+                document.getElementById("current_fixing").value=0;
+        }
+        
+        var pp_config={
+	        header: true,
+	        download: true,
+        	dynamicTyping: true,
+	        worker: false,
+	        newline: "\r\n",
+	        delimiter: "\t",
+	        complete: callb
+        };
+        
+        Papa.parse('search.php?isin=' + isin,pp_config);
+        
+        
+}
+
 // start when document is loaded
 $(document).ready(initialize);
