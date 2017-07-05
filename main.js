@@ -14,9 +14,9 @@ var get_bond_from_gui=function(){
         
         //convert strings
         notional=parseFloat(notional);
-        coupon=parseFloat(coupon)/100;
-        current_fixing=parseFloat(current_fixing)/100;
-        is_floater=(is_floater=="Yes");
+        coupon=(""==coupon) ? 0 : parseFloat(coupon)/100;
+        current_fixing=(""==current_fixing) ? 0 : parseFloat(current_fixing)/100;
+        is_floater=("Yes"==is_floater);
         
         var regxp=/(\d\d\d\d)\D{0,1}(\d\d)\D{0,1}(\d\d)\D{0,1}/
         var regxp_result=regxp.exec(maturity);
@@ -73,9 +73,9 @@ var display_risk=function(f,s){
 
 
         //risk scenarios
-        var target=document.getElementById("risk");
+        var target_table=document.getElementById("risk");
         
-        target.innerHTML="";
+        target_table.innerHTML="";
 
         if (0==s.length) return;
         
@@ -85,11 +85,8 @@ var display_risk=function(f,s){
                 max_perc=Math.max(max_perc, Math.abs(s[i].percentage));
         }
         
-        // create elements <table> and a <tbody>
-        var tbl= document.createElement("table");
-        tbl.className = "table table-bordered table-striped";
+        // create  a <tbody>
         var tblBody=document.createElement("tbody");
-        
         
         // create header
         var row = document.createElement("tr");
@@ -150,8 +147,8 @@ var display_risk=function(f,s){
                 //row added to end of table body
                 tblBody.appendChild(row);
         }
-        tbl.appendChild(tblBody);
-        target.appendChild(tbl);
+        target_table.appendChild(tblBody);
+
 }
 
 var risk_analysis=function(b){
@@ -172,8 +169,8 @@ var risk_analysis=function(b){
         var ytm=b.ytm(val_date,null,dirty_value);
         
         //calculate basic risk figures
-        var curve_50_plus={labels:["1Y"],times:[1],values:[0.005]};
-        var curve_50_minus={labels:["1Y"],times:[1],values:[-0.005]};
+        var curve_50_plus=get_const_curve(0.005);
+        var curve_50_minus=get_const_curve(-0.005);
         var ir_dur=b.dirty_value(val_date,curve_50_minus,null,curve_50_minus,ytm) - b.dirty_value(val_date,curve_50_plus,null,curve_50_plus,ytm);
         ir_dur=ir_dur/dirty_value*100;
         var spread_dur=b.dirty_value(val_date,curve_50_minus,null,null,ytm) - b.dirty_value(val_date,curve_50_plus,null,null,ytm);

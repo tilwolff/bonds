@@ -83,14 +83,3 @@ Bond.prototype.ytm=function(valdate,fwd_curve,dirty_value){
         }
         return res;
 }
-
-function str_to_time(str){
-        var num=parseInt(str);
-        var unit=str.charAt(str.length-1);
-        if( unit == 'Y' || unit == 'y') return num;
-        if( unit == 'M' || unit == 'm') return num/12;
-        if( unit == 'W' || unit == 'w') return num/52;
-        if( unit == 'D' || unit == 'd') return num/365;
-        console.log('str_to_time: Invalid time string' + str);
-        return null;
-}
