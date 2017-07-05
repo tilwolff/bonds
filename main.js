@@ -1,6 +1,6 @@
 
 var initialize=function(){
-        update_dirty_value();   
+        update_dirty_value();
 }
 
 var get_bond_from_gui=function(){
@@ -259,6 +259,12 @@ var isin_search=function(){
         var isin = document.getElementById("isin").value;
         
         var callb=function(results,file){
+        
+                if (0==results.data.length){
+                        make_alert("danger", "Query failed or no bond with ISIN <strong>"+isin+"</strong> found");
+                        return;
+                }
+        
                 //get data from returned object
                 var maturity = results.data[0].MATURITY_DATE;
                 var coupon = results.data[0].COUPON_RATE;
@@ -276,6 +282,8 @@ var isin_search=function(){
                 document.getElementById("freq").value="1Y";
                 document.getElementById("is_floater").value=is_floater;
                 document.getElementById("current_fixing").value=0;
+                
+                make_alert("success", "Found bond with ISIN <strong>"+isin+"</strong> from issuer <strong>"+results.data[0].ISSUER+"</strong>");
         }
         
         var pp_config={
@@ -289,6 +297,22 @@ var isin_search=function(){
         };
         
         Papa.parse('search.php?isin=' + isin,pp_config);
+}
+
+var make_alert=function(context, html_str){
+        var a=document.createElement("div");
+        a.className="alert alert-dismissible alert-"+context;
+        a.setAttribute("role", "alert");
+        
+        var b=document.createElement("button");
+        b.className="close";
+        b.setAttribute("data-dismiss", "alert");
+        b.innerHTML="<span>&times;</span>";
+        a.appendChild(b);
+        a.innerHTML+=html_str;
+
+        document.getElementById("alert-container").innerHTML="";        
+        document.getElementById("alert-container").appendChild(a);
 }
 
 // start when document is loaded
