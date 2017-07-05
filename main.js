@@ -283,7 +283,7 @@ var isin_search=function(){
                 document.getElementById("is_floater").value=is_floater;
                 document.getElementById("current_fixing").value=0;
                 
-                make_alert("success", "Found bond with ISIN <strong>"+isin+"</strong> from issuer <strong>"+results.data[0].ISSUER+"</strong>");
+                make_alert("success", "Found bond with ISIN <strong>"+isin+"</strong> from issuer <strong>"+results.data[0].ISSUER_NAME+"</strong>");
         }
         
         var pp_config={
