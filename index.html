@@ -68,9 +68,12 @@
         
 
                 <div class="container">
+                        <div id="alert-container">
+
+                        </div>
                         <div class="row">    
-                                <div class="col-lg-6">            
-                                       <div class="panel panel-default">
+                                <div class="col-lg-4">            
+                                       <div class="panel panel-primary">
                                                <div class="panel-heading">Valuation</div>
                                                 <div class="panel-body">
                                                         <div class="form-group">
@@ -80,83 +83,58 @@
                                                                         <input type="date" value="2017-01-01" class="form-control input-sm" id="val_date" onblur="update_dirty_value()">
                                                                         <span class="help-block">As of date for calculations.</span>
                                                                 </div>
-
-                                                
+                                                        </div>
+                                                        <div class="form-group">
                                                                 <!-- Market Value -->
 
                                                                 <label class="col-lg-4 control-label">Market Value</label>
                                                                 <div class="col-lg-8">
-                                                                      <div class="input-group">
+                                                                      <!--<div class="input-group">-->
                                                                                 <input type="number" step="any" class="form-control input-sm"  value="100" id="dirty_value" oninput="update_yield()" oninput="update_yield()">
-                                                                                <span class="input-group-btn">
+                                                                                <!--<span class="input-group-btn">
                                                                                         <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" data-container="body" title="Update market value and recalculate" onclick="update_dirty_value()">
                                                                                                 Calculate
                                                                                         </button>
                                                                                 </span>
-                                                                        </div>
+                                                                        </div>-->
                                                         
                                                                         <span class="help-block">The current market value (dirty).</span>
                                                                 </div>
-                                                                
+                                                        </div>
+                                                        <div class="form-group"> 
                                                         <!-- Yield -->
 
                                                                 <label class="col-lg-4 control-label">Yield-to-maturity</label>
                                                                 <div class="col-lg-8">
-                                                                        <div class="input-group">
+                                                                        <!--<div class="input-group">-->
                                                                                 <input type="number" step="0.01" class="form-control input-sm" value="0" id="ytm" oninput="update_dirty_value()">
-                                                                                <span class="input-group-btn">
+                                                                                <!--<span class="input-group-btn">
                                                                                         <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" data-container="body" title="Update yield-to-maturity and recalculate" onclick="update_yield()">
                                                                                                 Calculate
                                                                                         </button>
                                                                                 </span>
-                                                                        </div>
-                                                                        <span class="help-block">Yield-to-maturity (internal rate of return).</span>
+                                                                        </div>-->
+                                                                        <span class="help-block">Yield-to-maturity (internal rate of return).</br>&nbsp;</span>
                                                                 </div>
                                                         </div> 
                                                 </div>
                                         </div>
                                 </div>
-                        </div>  
-                        <div class="row">
-                                <div class="col-lg-6">                    
-                                        <form class="form-horizontal" autocomplete="false" id="form_bond">      
-                                        <div class="panel panel-default">
+                                <div class="col-lg-8">                    
+                                        <!--<form class="form-horizontal" autocomplete="false" id="form_bond">      -->
+                                        <div class="panel panel-primary">
                                                 <div class="panel-heading">Bond input data</div>
                                                 <div class="panel-body">
-
-                                                                <!-- Notional -->
                                                                 <div class="form-group">
-                                                                        <label class="col-lg-4 control-label">Notional</label>
-                                                                        <div class="col-lg-8">
+                                                                        <!-- Notional -->
+                                                                        <label class="col-lg-2 control-label">Notional</label>
+                                                                        <div class="col-lg-4">
                                                                                 <input type="number" step="any" class="form-control input-sm" value="100" id="notional" oninput="update_dirty_value()">
                                                                                 <span class="help-block">The amount repaid at maturity.</span>
                                                                         </div>
-
-                                                                </div>
-
-                                                                
-                                                                <!-- Maturity Date -->
-                                                                <div class="form-group">
-                                                                        <label class="col-lg-4 control-label">Maturity</label>
-                                                                        <div class="col-lg-8">
-                                                                                <input type="date" class="form-control input-sm" value="2026-12-31" id="maturity" onblur="update_dirty_value()">
-                                                                                <span class="help-block">The date on which the notional is repaid (yyyy-mm-dd).</span>
-                                                                        </div>
-                                                                </div>
-                                                                
-                                                                <!-- Coupon -->
-                                                                <div class="form-group">
-                                                                        <label class="col-lg-4 control-label">Coupon</label>
-                                                                        <div class="col-lg-8">
-                                                                                <input type="number" step="0.125" class="form-control input-sm" value="0.875" id="coupon" oninput="update_dirty_value()">
-                                                                                <span class="help-block">Coupon rate or, for floating rate bonds, spread over reference rate (e.g. 1.0 for 1 percent).</span>
-                                                                        </div>
-                                                                </div>
-                                                                
-                                                                <!-- Coupon Frequency -->
-                                                                <div class="form-group">
-                                                                        <label class="col-lg-4 control-label">Coupon frequency</label>
-                                                                        <div class="col-lg-8">
+                                                                        <!-- Coupon Frequency -->
+                                                                        <label class="col-lg-3 control-label">Coupon frequency</label>
+                                                                        <div class="col-lg-3">
                                                                         <select class="form-control input-sm" id="freq" value="6M" onchange="update_dirty_value()">
                                                                                   <option value="1M">1M</option>
                                                                                   <option value="3M">3M</option>
@@ -166,34 +144,76 @@
                                                                         <span class="help-block">Coupon frequency.</span>
                                                                         </div>
                                                                 </div>
-                                                                
-                                                                <!-- Is Floater? -->
+
                                                                 <div class="form-group">
-                                                                        <label class="col-lg-4 control-label">Is floating rate bond?</label>
-                                                                        <div class="col-lg-8">
+                                                                        <!-- Maturity Date -->
+                                                                        <label class="col-lg-2 control-label">Maturity</label>
+                                                                        <div class="col-lg-4">
+                                                                                <input type="date" class="form-control input-sm" value="2026-12-31" id="maturity" onblur="update_dirty_value()">
+                                                                                <span class="help-block">The date on which the notional is repaid (yyyy-mm-dd).</span>
+                                                                        </div>
+                                                                        <!-- Is Floater? -->
+                                                                        <label class="col-lg-3 control-label">Is floating rate bond?</label>
+                                                                        <div class="col-lg-3">
                                                                         <select class="form-control input-sm" id="is_floater" value="No" onchange="update_dirty_value()">
                                                                                   <option value="No">No</option>
                                                                                   <option value="Yes">Yes</option>
                                                                         </select>
                                                                         <span class="help-block">Yes if floating rate bond, No else.</span>
                                                                         </div>
+                                                                        
                                                                 </div>
-
-                                                                <!-- Current coupon fixing -->
+                                                                
+                                                                
                                                                 <div class="form-group">
-                                                                        <label class="col-lg-4 control-label">Current coupon fixing</label>
-                                                                        <div class="col-lg-8">
+                                                                        <!-- Coupon -->
+                                                                        <label class="col-lg-2 control-label">Coupon</label>
+                                                                        <div class="col-lg-4">
+                                                                                <input type="number" step="0.125" class="form-control input-sm" value="0.875" id="coupon" oninput="update_dirty_value()">
+                                                                                <span class="help-block">Coupon rate or, for floating rate bonds, spread over reference rate (e.g. 1.0 for 1 percent).</span>
+                                                                        </div>
+                                                                        <!-- Current coupon fixing -->         
+                                                                        <label class="col-lg-3 control-label">Current coupon fixing</label>
+                                                                        <div class="col-lg-3">
                                                                                 <input type="number" step="0.125" class="form-control input-sm" value="0" id="current_fixing" oninput="update_dirty_value()">
                                                                                 <span class="help-block">Current coupon fixing for floating rate bonds (e.g. 2.0 for 2 percent).</span>
-                                                                        </div>
+                                                                        </div>                                                                                                                                     
                                                                 </div>
                                                         </div>
                                                 </div>
-                                        </form>
+                                       <!-- </form>-->
                                 </div>
-                                <div class="col-lg-6">
+                        </div>
+                        
+                        <div class="row">
+                                <div class="col-lg-4">
                                         <div class="panel panel-default">
-                                                <div class="panel-heading">Risk analysis</div>
+<!--                                                <div class="panel-heading">Main risk figures</div>
+                                                <div class="panel-body" id="info">-->
+                                                        <ul class="list-group">
+                                                                <li class="list-group-item active">
+                                                                        Main risk figures
+                                                                </li>
+                                                                <li class="list-group-item">
+                                                                        <span class="badge" id="ttm"></span>
+                                                                        Time to maturity
+                                                                </li>
+                                                                <li class="list-group-item" data-toggle="tooltip" data-container="body" title="Loss under a 100 bp interest rate increase">
+                                                                        <span class="badge" id="ir_duration"></span>
+                                                                        Effective interest rate duration
+                                                                </li>
+                                                                <li class="list-group-item" data-toggle="tooltip" data-container="body" title="Loss under a 100 bp credit spread increase">
+                                                                        <span class="badge" id="spread_duration"></span>
+                                                                        Effective spread duration
+                                                                </li>
+                                                        </ul>
+                                                <!--</div>-->
+                                        </div>
+                                </div>
+
+                                <div class="col-lg-8">
+                                        <div class="panel panel-default">
+                                                <div class="panel-heading">Scenario analysis</div>
                                                         <div class="panel-body" id="risk">
                                                         </div>
                                                 </div>

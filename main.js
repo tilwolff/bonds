@@ -1,6 +1,6 @@
 
 var initialize=function(){
-        risk_analysis();
+        update_dirty_value();   
 }
 
 var get_bond_from_gui=function(){
@@ -42,7 +42,7 @@ var update_dirty_value=function(){
         val_date=new Date(regxp_result[1],regxp_result[2]-1,regxp_result[3],0,0,0);
         var dirty_value=b.dirty_value(val_date,null,null,null,ytm);
         document.getElementById("dirty_value").value=Math.round(dirty_value*100)/100;
-        risk_analysis();
+        risk_analysis(b);
 }
 
 
@@ -62,10 +62,17 @@ var update_yield=function(){
         val_date=new Date(regxp_result[1],regxp_result[2]-1,regxp_result[3],0,0,0);
         var ytm=b.ytm(val_date,null,dirty_value);
         document.getElementById("ytm").value=Math.round(ytm*1000000)/10000;
-        risk_analysis();
+        risk_analysis(b);
 }
 
-var display_scenarios=function(s){
+var display_risk=function(f,s){
+        //risk figures
+        document.getElementById("ttm").innerHTML=f.ttm.toFixed(2)+ " Years";
+        document.getElementById("ir_duration").innerHTML=f.ir_duration.toFixed(2);
+        document.getElementById("spread_duration").innerHTML=f.spread_duration.toFixed(2);
+
+
+        //risk scenarios
         var target=document.getElementById("risk");
         
         target.innerHTML="";
@@ -147,8 +154,7 @@ var display_scenarios=function(s){
         target.appendChild(tbl);
 }
 
-var risk_analysis=function(){
-        var b=get_bond_from_gui();
+var risk_analysis=function(b){
 
         //get data from html form        
         var val_date = document.getElementById("val_date").value;
@@ -162,8 +168,24 @@ var risk_analysis=function(){
         
         val_date=new Date(regxp_result[1],regxp_result[2]-1,regxp_result[3],0,0,0);
 
+        //calculate yield
         var ytm=b.ytm(val_date,null,dirty_value);
         
+        //calculate basic risk figures
+        var curve_50_plus={labels:["1Y"],times:[1],values:[0.005]};
+        var curve_50_minus={labels:["1Y"],times:[1],values:[-0.005]};
+        var ir_dur=b.dirty_value(val_date,curve_50_minus,null,curve_50_minus,ytm) - b.dirty_value(val_date,curve_50_plus,null,curve_50_plus,ytm);
+        ir_dur=ir_dur/dirty_value*100;
+        var spread_dur=b.dirty_value(val_date,curve_50_minus,null,null,ytm) - b.dirty_value(val_date,curve_50_plus,null,null,ytm);
+        spread_dur=spread_dur/dirty_value*100;
+        var figures={
+                ttm: (b._maturity-val_date)  / (1000*60*60*24*365),
+                ir_duration: ir_dur,
+                spread_duration: spread_dur
+        };
+        
+        
+        //create bcbs 352 scenarios
         var bcbs352times=[0.0028,0.0417,0.1667,0.375,0.625,0.875,1.25,1.75,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,12.5,17.5,25];
         
         var curve_up={labels:[],times:bcbs352times,values:[]};
@@ -233,7 +255,7 @@ var risk_analysis=function(){
                 
         }
         
-        display_scenarios(scenarios);
+        display_risk(figures,scenarios);
 }
 
 var isin_search=function(){
@@ -270,8 +292,6 @@ var isin_search=function(){
         };
         
         Papa.parse('search.php?isin=' + isin,pp_config);
-        
-        
 }
 
 // start when document is loaded
