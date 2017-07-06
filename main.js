@@ -71,7 +71,6 @@ var display_risk=function(f,s){
         document.getElementById("ir_duration").innerHTML=f.ir_duration.toFixed(2);
         document.getElementById("spread_duration").innerHTML=f.spread_duration.toFixed(2);
 
-
         //risk scenarios
         var target_table=document.getElementById("risk");
         
@@ -171,10 +170,14 @@ var risk_analysis=function(b){
         //calculate basic risk figures
         var curve_50_plus=get_const_curve(0.005);
         var curve_50_minus=get_const_curve(-0.005);
+        var curve_1_plus=get_const_curve(0.0001);
+        //effective ir duration
         var ir_dur=b.dirty_value(val_date,curve_50_minus,null,curve_50_minus,ytm) - b.dirty_value(val_date,curve_50_plus,null,curve_50_plus,ytm);
         ir_dur=ir_dur/dirty_value*100;
+        //effective spread duration
         var spread_dur=b.dirty_value(val_date,curve_50_minus,null,null,ytm) - b.dirty_value(val_date,curve_50_plus,null,null,ytm);
         spread_dur=spread_dur/dirty_value*100;
+        
         var figures={
                 ttm: (b._maturity-val_date)  / (1000*60*60*24*365),
                 ir_duration: ir_dur,
@@ -204,12 +207,15 @@ var risk_analysis=function(b){
                 curve_flattener.values.push(0.8*0.025*sshort-0.6*0.01*slong);
         }
         
-                                
-                                
+
+        var b_ir_dur=new Bond(dirty_value*Math.pow(1+ytm,ir_dur),new Date(val_date.getTime()+ir_dur*(1000*60*60*24*365)),0,"1Y",false,0, null);
+        var b_spread_dur=new Bond(dirty_value*Math.pow(1+ytm,spread_dur),new Date(val_date.getTime()+spread_dur*(1000*60*60*24*365)),0,"1Y",false,0, null);
+              
         var scenarios=[
                 {
                         description: "Spread Shock +1 bp",
-                        value: b.dirty_value(val_date,null,null,null,ytm+0.0001)
+                        value: b.dirty_value(val_date,null,null,null,ytm+0.0001),
+                        value_dur: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.0001)
                 },{
                         description: "Spread Shock +50 bp",
                         value: b.dirty_value(val_date,null,null,null,ytm+0.005)
@@ -221,29 +227,37 @@ var risk_analysis=function(b){
                         value: b.dirty_value(val_date,null,null,null,ytm+0.02)
                 },{
                         description: "Spread Shock +500 bp",
-                        value: b.dirty_value(val_date,null,null,null,ytm+0.05)
+                        value: b.dirty_value(val_date,null,null,null,ytm+0.05),
+                        value_dur: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.05)
                 },{
                         description: "Spread Shock +1000 bp",
                         value: b.dirty_value(val_date,null,null,null,ytm+0.1)
                 },{
                         description: "BCBS 368 Up",
-                        value: b.dirty_value(val_date,curve_up,null,curve_up,ytm)
+                        value: b.dirty_value(val_date,curve_up,null,curve_up,ytm),
+                        value_dur: b_ir_dur.dirty_value(val_date,curve_up,null,curve_up,ytm)
+
                 },{
                         description: "BCBS 368 Down",
-                        value: b.dirty_value(val_date,curve_down,null,curve_down,ytm)
+                        value: b.dirty_value(val_date,curve_down,null,curve_down,ytm),
+                        value_dur: b_ir_dur.dirty_value(val_date,curve_down,null,curve_down,ytm)
                 },{
                         description: "BCBS 368 Steepener",
-                        value: b.dirty_value(val_date,curve_steepener,null,curve_steepener,ytm)
+                        value: b.dirty_value(val_date,curve_steepener,null,curve_steepener,ytm),
+                        value_dur: b_ir_dur.dirty_value(val_date,curve_steepener,null,curve_steepener,ytm)
                 },{
                         description: "BCBS 368 Flattener",
-                        value: b.dirty_value(val_date,curve_flattener,null,curve_flattener,ytm)
+                        value: b.dirty_value(val_date,curve_flattener,null,curve_flattener,ytm),
+                        value_dur: b_ir_dur.dirty_value(val_date,curve_flattener,null,curve_flattener,ytm)
                 },{
                         description: "BCBS 368 Short Rate Up",
-                        value: b.dirty_value(val_date,curve_shortup,null,curve_shortup,ytm)
+                        value: b.dirty_value(val_date,curve_shortup,null,curve_shortup,ytm),
+                        value_dur: b_ir_dur.dirty_value(val_date,curve_shortup,null,curve_shortup,ytm)
                 },{
                         description: "BCBS 368 Short Rate Down",
-                        value: b.dirty_value(val_date,curve_shortdown,null,curve_shortdown,ytm)
-                }
+                        value: b.dirty_value(val_date,curve_shortdown,null,curve_shortdown,ytm),
+                        value_dur: b_ir_dur.dirty_value(val_date,curve_shortdown,null,curve_shortdown,ytm)
+                        }
         ];
         
         for (var i=0;i<scenarios.length;i++){
