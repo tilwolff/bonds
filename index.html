@@ -214,8 +214,15 @@
                                 <div class="col-lg-8">
                                         <div class="panel panel-info">
                                                 <div class="panel-heading">Scenario analysis</div>
-                                                        <div class="panel-body" >Analyse the impact of standardised interest rate and spread scenarios on the bond.
+                                                        <div class="panel-body" >
+                                                        <div class="btn-group pull-right" role="group" aria-label="...">
+                                                                <button type="button" class="btn btn-default" onclick="switch_to_exact()">Cash-flow based calculation</button>
+                                                                <button type="button" class="btn btn-default" onclick="switch_to_duration()">Effective duration based approximation</button>
                                                         </div>
+                                                        </div>
+                                                        
+                                                        
+                                                        
                                                         <table class="table table-striped table-hover" id="risk"></table>
                                                 </div>
                                         </div>
