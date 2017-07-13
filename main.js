@@ -84,7 +84,8 @@ var display_risk=function(f,s){
         document.getElementById("ttm").innerHTML=f.ttm.toFixed(2)+ " Years";
         document.getElementById("ir_duration").innerHTML=f.ir_duration.toFixed(2);
         document.getElementById("spread_duration").innerHTML=f.spread_duration.toFixed(2);
-
+        document.getElementById("bpv").innerHTML=(Math.round((f.bpv * 1000)/10)/100).toLocaleString();
+        
         //risk scenarios
         var target_table=document.getElementById("risk");
         
@@ -182,20 +183,23 @@ var risk_analysis=function(b){
         var ytm=b.ytm(val_date,null,dirty_value);
         
         //calculate basic risk figures
-        var curve_50_plus=get_const_curve(0.005);
-        var curve_50_minus=get_const_curve(-0.005);
         var curve_1_plus=get_const_curve(0.0001);
+        var curve_1_minus=get_const_curve(-0.0001);
         //effective ir duration
-        var ir_dur=b.dirty_value(val_date,curve_50_minus,null,curve_50_minus,ytm) - b.dirty_value(val_date,curve_50_plus,null,curve_50_plus,ytm);
-        ir_dur=ir_dur/dirty_value*100;
+        var ir_dur=b.dirty_value(val_date,curve_1_minus,null,curve_1_minus,ytm) - b.dirty_value(val_date,curve_1_plus,null,curve_1_plus,ytm);
+        ir_dur=ir_dur/dirty_value*5000;
         //effective spread duration
-        var spread_dur=b.dirty_value(val_date,curve_50_minus,null,null,ytm) - b.dirty_value(val_date,curve_50_plus,null,null,ytm);
-        spread_dur=spread_dur/dirty_value*100;
+        var spread_dur=b.dirty_value(val_date,curve_1_minus,null,null,ytm) - b.dirty_value(val_date,curve_1_plus,null,null,ytm);
+        spread_dur=spread_dur/dirty_value*5000;
+        var bpv=b.dirty_value(val_date,curve_1_plus,null,null,ytm) - b.dirty_value(val_date,curve_1_minus,null,null,ytm);
+        bpv/=2;
         
+        //present value of a spread basis point
         var figures={
                 ttm: (b._maturity-val_date)  / (1000*60*60*24*365),
                 ir_duration: ir_dur,
-                spread_duration: spread_dur
+                spread_duration: spread_dur,
+                bpv: bpv
         };
         
         
