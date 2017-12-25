@@ -66,19 +66,6 @@ var update_yield=function(){
         risk_analysis(b);
 }
 
-var switch_to_exact=function(){
-        if (g_method_exact) return
-        g_method_exact=true;
-        update_dirty_value();
-}
-
-
-var switch_to_duration=function(){
-        if (!g_method_exact) return
-        g_method_exact=false;
-        update_dirty_value();
-}
-
 var display_risk=function(f,s){
         //risk figures
         document.getElementById("ttm").innerHTML=f.ttm.toFixed(2)+ " Years";
@@ -93,10 +80,10 @@ var display_risk=function(f,s){
 
         if (0==s.length) return;
         
-        var max_perc=0;
+        var max_diff=0;
         //find max abs percentage
         for (var i=0;i<s.length;i++){
-                max_perc=Math.max(max_perc, Math.abs(s[i].percentage));
+                max_diff=Math.max(max_diff, Math.abs(s[i].diff_bp));
         }
         
         // create  a <tbody>
@@ -108,12 +95,18 @@ var display_risk=function(f,s){
         cell.innerHTML="Scenario";
         row.appendChild(cell);
         
-        cell = document.createElement("th");    
-        cell.innerHTML="Value Change absolute";
+        cell = document.createElement("th");   
+        cell.className="text-right"; 
+        cell.innerHTML="Value Change (exact)";
         row.appendChild(cell);
         
         cell = document.createElement("th");    
-        cell.innerHTML="Value Change Percent";
+        cell.innerHTML="Value Change (approx. via eff. duration)";
+        cell.className="text-right";
+        row.appendChild(cell);
+        
+        cell = document.createElement("th");    
+        cell.innerHTML="Difference [bp]";
         row.appendChild(cell);
         
         tblBody.appendChild(row);
@@ -131,7 +124,12 @@ var display_risk=function(f,s){
                 row.appendChild(cell);
                 
                 cell = document.createElement("td");
-                cell.innerHTML=(Math.round((s[i].value_change * 1000)/10)/100).toLocaleString();
+                cell.innerHTML=(Math.round((s[i].value_change_exact * 1000)/10)/100).toLocaleString();
+                cell.style.textAlign = "right";
+                row.appendChild(cell);
+                
+                cell = document.createElement("td");
+                cell.innerHTML=(Math.round((s[i].value_change_approx * 1000)/10)/100).toLocaleString();
                 cell.style.textAlign = "right";
                 row.appendChild(cell);
                 
@@ -143,15 +141,10 @@ var display_risk=function(f,s){
                 progressbar=document.createElement("div");
                 progressbar.className="progress-bar";
                 progressbar.setAttribute("role", "progressbar"); 
-                progressbar.innerHTML=s[i].percentage.toFixed(2)+"%";
-                if (s[i].percentage>0){
-                progressbar.className+=" progress-bar-success";
-                progressbar.style.width = (s[i].percentage/max_perc*100).toFixed(2)+"%";
-                
-                }else{
+                progressbar.innerHTML=s[i].diff_bp.toFixed(2);
+
                 progressbar.className+=" progress-bar-danger";
-                progressbar.style.width = (-s[i].percentage/max_perc*100).toFixed(2)+"%";
-                }
+                progressbar.style.width = (s[i].diff_bp/max_diff*100).toFixed(2)+"%";
                 
                 
                 progress.appendChild(progressbar);                
@@ -225,60 +218,65 @@ var risk_analysis=function(b){
                 curve_flattener.values.push(0.8*0.025*sshort-0.6*0.01*slong);
         }
         
-        var b_ir_dur;        
-        var b_spread_dur;
-        
-        if(g_method_exact){
-                b_ir_dur=b;
-                b_spread_dur=b;
-        }else{
-                b_ir_dur=new Bond(dirty_value*Math.pow(1+ytm,ir_dur),new Date(val_date.getTime()+ir_dur*(1000*60*60*24*365)),0,"1Y",false,0, null);
-                b_spread_dur=new Bond(dirty_value*Math.pow(1+ytm,spread_dur),new Date(val_date.getTime()+spread_dur*(1000*60*60*24*365)),0,"1Y",false,0, null);
-        }
+        var b_ir_dur=new Bond(dirty_value*Math.pow(1+ytm,ir_dur),new Date(val_date.getTime()+ir_dur*(1000*60*60*24*365)),0,"1Y",false,0, null);
+        var b_spread_dur=new Bond(dirty_value*Math.pow(1+ytm,spread_dur),new Date(val_date.getTime()+spread_dur*(1000*60*60*24*365)),0,"1Y",false,0, null);
         
         var scenarios=[
                 {
-                        description: "IR BCBS 368 Up",
-                        value: b_ir_dur.dirty_value(val_date,curve_up,null,curve_up,ytm)
+                        description: "Interest Rate BCBS 368 Up",
+                        value_exact: b.dirty_value(val_date,curve_up,null,curve_up,ytm),
+                        value_approx: b_ir_dur.dirty_value(val_date,curve_up,null,curve_up,ytm)
                 },{
-                        description: "IR BCBS 368 Down",
-                        value: b_ir_dur.dirty_value(val_date,curve_down,null,curve_down,ytm)
+                        description: "Interest Rate BCBS 368 Down",
+                        value_exact: b.dirty_value(val_date,curve_down,null,curve_down,ytm),
+                        value_approx: b_ir_dur.dirty_value(val_date,curve_down,null,curve_down,ytm)
                 },{
-                        description: "IR BCBS 368 Steepener",
-                        value: b_ir_dur.dirty_value(val_date,curve_steepener,null,curve_steepener,ytm)
+                        description: "Interest Rate BCBS 368 Steepener",
+                        value_exact: b.dirty_value(val_date,curve_steepener,null,curve_steepener,ytm),
+                        value_approx: b_ir_dur.dirty_value(val_date,curve_steepener,null,curve_steepener,ytm)
                 },{
-                        description: "IR BCBS 368 Flattener",
-                        value: b_ir_dur.dirty_value(val_date,curve_flattener,null,curve_flattener,ytm)
+                        description: "Interest Rate BCBS 368 Flattener",
+                        value_exact: b.dirty_value(val_date,curve_flattener,null,curve_flattener,ytm),
+                        value_approx: b_ir_dur.dirty_value(val_date,curve_flattener,null,curve_flattener,ytm)
                 },{
-                        description: "IR BCBS 368 Short Rate Up",
-                        value: b_ir_dur.dirty_value(val_date,curve_shortup,null,curve_shortup,ytm)
+                        description: "Interest Rate BCBS 368 Short Rate Up",
+                        value_exact: b.dirty_value(val_date,curve_shortup,null,curve_shortup,ytm),
+                        value_approx: b_ir_dur.dirty_value(val_date,curve_shortup,null,curve_shortup,ytm)
                 },{
-                        description: "IR BCBS 368 Short Rate Down",
-                        value: b_ir_dur.dirty_value(val_date,curve_shortdown,null,curve_shortdown,ytm)
+                        description: "Interest Rate BCBS 368 Short Rate Down",
+                        value_exact: b.dirty_value(val_date,curve_shortdown,null,curve_shortdown,ytm),
+                        value_approx: b_ir_dur.dirty_value(val_date,curve_shortdown,null,curve_shortdown,ytm)
                 },{
                         description: "Spread Shock +1 bp",
-                        value: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.0001)
+                        value_exact: b.dirty_value(val_date,null,null,null,ytm+0.0001),
+                        value_approx: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.0001)
                 },{
                         description: "Spread Shock +50 bp",
-                        value: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.005)
+                        value_exact: b.dirty_value(val_date,null,null,null,ytm+0.005),
+                        value_approx: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.005)
                 },{
                         description: "Spread Shock +100 bp",
-                        value: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.01)
+                        value_exact: b.dirty_value(val_date,null,null,null,ytm+0.01),
+                        value_approx: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.01)
                 },{
                         description: "Spread Shock +200 bp",
-                        value: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.02)
+                        value_exact: b.dirty_value(val_date,null,null,null,ytm+0.02),
+                        value_approx: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.02)
                 },{
                         description: "Spread Shock +500 bp",
-                        value: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.05),
+                        value_exact: b.dirty_value(val_date,null,null,null,ytm+0.05),
+                        value_approx: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.05)
                 },{
                         description: "Spread Shock +1000 bp",
-                        value: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.1)
+                        value_exact: b.dirty_value(val_date,null,null,null,ytm+0.1),
+                        value_approx: b_spread_dur.dirty_value(val_date,null,null,null,ytm+0.1)
                 }
         ];
         
         for (var i=0;i<scenarios.length;i++){
-                scenarios[i].value_change=(scenarios[i].value-dirty_value);
-                scenarios[i].percentage=scenarios[i].value_change/Math.abs(dirty_value)*100;
+                scenarios[i].value_change_exact=(scenarios[i].value_exact-dirty_value);
+                scenarios[i].value_change_approx=(scenarios[i].value_approx-dirty_value);
+                scenarios[i].diff_bp=Math.abs(scenarios[i].value_change_exact-scenarios[i].value_change_approx)/Math.abs(bpv);
                 
         }
         
